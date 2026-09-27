@@ -1,0 +1,41 @@
+{
+  "manifest_version": 3,
+  "name": "Resilient Download Manager & Resume Fixer",
+  "version": "1.2.0",
+  "description": "Download manager with parallel connections, pause/resume, crash recovery and expired-link refreshing.",
+  "permissions": [
+    "downloads",
+    "downloads.open",
+    "storage",
+    "contextMenus",
+    "notifications",
+    "unlimitedStorage",
+    "offscreen",
+    "alarms",
+    "declarativeNetRequestWithHostAccess"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Resilient Download Manager",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "options_page": "dashboard.html",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

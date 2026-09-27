@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resilient Download Manager - Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h2>Resilient DL</h2>
+          <span>Pro Manager</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-item active" data-tab="downloads">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>All Downloads</span>
+          <span class="nav-badge" id="badgeAll">0</span>
+        </button>
+        <button class="nav-item" data-tab="active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span>Active</span>
+          <span class="nav-badge highlight" id="badgeActive">0</span>
+        </button>
+        <button class="nav-item" data-tab="paused">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+          <span>Paused / Expired</span>
+          <span class="nav-badge" id="badgePaused">0</span>
+        </button>
+        <button class="nav-item" data-tab="completed">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Completed</span>
+          <span class="nav-badge" id="badgeCompleted">0</span>
+        </button>
+        <button class="nav-item" data-tab="inspector">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          <span>Link Health Inspector</span>
+        </button>
+        <button class="nav-item" data-tab="settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Settings</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="resume-guarantee-card">
+          <h4>🛡️ Resume Guard Active</h4>
+          <p>Chunked caching prevents broken downloads when pausing or when links expire.</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Action Bar -->
+      <header class="top-bar">
+        <div class="page-title">
+          <h1 id="pageTitle">Downloads</h1>
+        </div>
+        <div class="top-actions">
+          <button id="btnNewDownload" class="btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add New Download
+          </button>
+        </div>
+      </header>
+
+      <!-- Downloads Tab View -->
+      <div class="tab-content" id="tabDownloadsView">
+        <div class="table-container">
+          <table class="download-table">
+            <thead>
+              <tr>
+                <th>File Name</th>
+                <th>Size</th>
+                <th>Progress</th>
+                <th>Speed</th>
+                <th>ETA</th>
+                <th>Status</th>
+                <th>Engine</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="downloadTableBody">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+          <div id="tableEmptyState" class="empty-table hidden">
+            <p>No downloads in this view</p>
+          </div>
+        </div>
+
+        <!-- Chunk Visualizer Drawer / Panel -->
+        <div id="chunkVisualizerPanel" class="visualizer-panel hidden">
+          <div class="panel-header">
+            <div class="panel-title-area">
+              <h3 id="visFileName">File Name</h3>
+              <span class="text-muted text-sm" id="visStats">0 MB / 0 MB • 0 / 0 chunks</span>
+            </div>
+            <button id="btnCloseVisualizer" class="btn-close">&times;</button>
+          </div>
+          <div class="chunk-grid-container">
+            <div class="chunk-legend">
+              <span class="legend-item"><span class="legend-box chunk-done"></span> Downloaded</span>
+              <span class="legend-item"><span class="legend-box chunk-active"></span> Downloading</span>
+              <span class="legend-item"><span class="legend-box chunk-pending"></span> Pending</span>
+            </div>
+            <div class="chunk-grid" id="chunkGrid"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings Tab View -->
+      <div class="tab-content hidden" id="tabSettingsView">
+        <div class="inspector-card settings-card">
+          <h2>Browser download capture</h2>
+          <p class="text-muted">
+            When you start a normal download in the browser, Resilient DL checks the link. If the server supports resuming, it takes the download over and uses parallel connections, pause/resume and crash recovery.
+            Anything it can't improve on (form submissions, one-time links, small files, servers without resume support) is left to the browser untouched.
+          </p>
+
+          <label class="setting-row">
+            <input type="checkbox" id="setCaptureEnabled">
+            <span><b>Take over browser downloads automatically</b></span>
+          </label>
+
+          <div class="settings-grid">
+            <div>
+              <label class="form-label" for="setMinSize">Only capture files larger than (MB)</label>
+              <input type="text" id="setMinSize" inputmode="decimal" placeholder="1">
+            </div>
+            <div>
+              <label class="form-label" for="setConnections">Connections for captured downloads</label>
+              <select id="setConnections">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="4">4 (Recommended)</option>
+                <option value="8">8</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" for="setChunkSize">Chunk size</label>
+              <select id="setChunkSize">
+                <option value="2">2 MB</option>
+                <option value="4">4 MB</option>
+                <option value="8">8 MB</option>
+                <option value="16">16 MB</option>
+              </select>
+            </div>
+          </div>
+
+          <label class="form-label" for="setExcluded">Never capture from these sites (one per line, e.g. <code>drive.google.com</code>)</label>
+          <textarea id="setExcluded" rows="5" placeholder="example.com"></textarea>
+
+          <div class="settings-actions">
+            <button id="btnSaveSettings" class="btn-primary">Save settings</button>
+            <span id="settingsSaved" class="text-muted text-sm hidden">Saved ✓</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Link Health Inspector Tab View -->
+      <div class="tab-content hidden" id="tabInspectorView">
+        <div class="inspector-card">
+          <h2>Pre-Flight Link Health & Resume Inspector</h2>
+          <p class="text-muted">
+            Test any link before downloading to verify if the remote server supports HTTP Range headers (pausing & resuming), content length, and file metadata.
+          </p>
+
+          <div class="inspector-input-row">
+            <input type="url" id="inspectorInputUrl" placeholder="https://example.com/large-archive.iso">
+            <button id="btnRunInspection" class="btn-primary">Inspect Link</button>
+          </div>
+
+          <div id="inspectorResults" class="inspector-results hidden">
+            <div class="result-grid">
+              <div class="result-box">
+                <span class="res-label">Resume Capability</span>
+                <span class="res-val highlight-green" id="resResume">-</span>
+              </div>
+              <div class="result-box">
+                <span class="res-label">Content Length</span>
+                <span class="res-val" id="resLength">-</span>
+              </div>
+              <div class="result-box">
+                <span class="res-label">Server HTTP Status</span>
+                <span class="res-val" id="resStatus">-</span>
+              </div>
+              <div class="result-box">
+                <span class="res-label">Detected Filename</span>
+                <span class="res-val font-mono" id="resFilename">-</span>
+              </div>
+              <div class="result-box">
+                <span class="res-label">MIME Type</span>
+                <span class="res-val" id="resMime">-</span>
+              </div>
+              <div class="result-box">
+                <span class="res-label">ETag / Identifier</span>
+                <span class="res-val font-mono" id="resEtag">-</span>
+              </div>
+            </div>
+
+            <div class="inspector-action-banner">
+              <span id="resSummaryText">This file can be paused and resumed safely.</span>
+              <button id="btnStartFromInspector" class="btn-primary">Download With Resilient Downloader</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal: Add New Download -->
+  <div class="modal-overlay hidden" id="dashAddModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>New Resilient Download</h3>
+        <button class="btn-close" id="btnDashCloseAdd">&times;</button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label" for="dashInputUrl">Download URL</label>
+        <input type="url" id="dashInputUrl" placeholder="https://example.com/file.zip" required>
+
+        <label class="form-label" for="dashInputFilename">Custom Filename (Optional)</label>
+        <input type="text" id="dashInputFilename" placeholder="Leave blank to auto-detect">
+
+        <label class="form-label" for="dashSelectChunkSize">Chunk Block Size</label>
+        <select id="dashSelectChunkSize">
+          <option value="2">2 MB</option>
+          <option value="4" selected>4 MB (Recommended)</option>
+          <option value="8">8 MB</option>
+          <option value="16">16 MB</option>
+        </select>
+
+        <label class="form-label" for="dashSelectConnections">Parallel Connections</label>
+        <select id="dashSelectConnections">
+          <option value="1">1 (gentle on the server)</option>
+          <option value="2">2</option>
+          <option value="4" selected>4 (Recommended)</option>
+          <option value="8">8 (fastest)</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button id="btnDashCancelAdd" class="btn-secondary">Cancel</button>
+        <button id="btnDashStartAdd" class="btn-primary">Start Download</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Refresh Link -->
+  <div class="modal-overlay hidden" id="dashRefreshModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Refresh Expired Download Link</h3>
+        <button class="btn-close" id="btnDashCloseRefresh">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="text-sm text-muted">
+          Paste the updated download link generated from the host. Download will resume from the current saved chunk without restarting.
+        </p>
+        <input type="hidden" id="dashRefreshTaskId">
+        <label class="form-label" for="dashInputNewUrl">New Download URL</label>
+        <input type="url" id="dashInputNewUrl" placeholder="https://example.com/new_session_url" required>
+        <div id="dashRefreshError" class="alert-error hidden"></div>
+      </div>
+      <div class="modal-footer">
+        <button id="btnDashCancelRefresh" class="btn-secondary">Cancel</button>
+        <button id="btnDashConfirmRefresh" class="btn-primary">Update & Resume</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="dashboard.js"></script>
+</body>
+</html>

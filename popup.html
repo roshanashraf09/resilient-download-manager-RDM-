@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resilient Download Manager</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo-area">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+        </div>
+        <div class="title-group">
+          <h1>Resilient DL</h1>
+          <span class="badge resume-badge">Resume Guard</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="btnCaptureToggle" class="capture-toggle" title="Automatically take over downloads you start in the browser">
+          <span class="capture-dot"></span><span id="captureLabel">Capture</span>
+        </button>
+        <button id="btnOpenAddModal" class="btn-icon" title="New Resilient Download">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <button id="btnOpenDashboard" class="btn-icon" title="Open Full Dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="M14 9h7"/><path d="M14 15h7"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Global Speed & Activity Banner -->
+    <div class="stats-banner">
+      <div class="stat-item">
+        <span class="stat-label">Active</span>
+        <span id="activeCount" class="stat-val">0</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-label">Total Speed</span>
+        <span id="totalSpeed" class="stat-val">0 KB/s</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-label">Paused</span>
+        <span id="pausedCount" class="stat-val">0</span>
+      </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" data-filter="all">All</button>
+      <button class="tab-btn" data-filter="downloading">Active</button>
+      <button class="tab-btn" data-filter="paused">Paused</button>
+      <button class="tab-btn" data-filter="completed">Done</button>
+    </div>
+
+    <!-- Download Items List -->
+    <main class="download-list" id="downloadList">
+      <!-- Dynamic download cards injected here -->
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">📥</div>
+        <p class="empty-title">No downloads yet</p>
+        <p class="empty-desc">Add a URL with Resume Guard to never lose your progress.</p>
+        <button id="btnEmptyAdd" class="btn-primary">Add Resilient Download</button>
+      </div>
+    </main>
+
+    <!-- Modal: Add New Download -->
+    <div class="modal-overlay hidden" id="addModal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>New Resilient Download</h3>
+          <button class="btn-close" id="btnCloseAddModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <label class="form-label" for="inputUrl">Download URL</label>
+          <div class="input-group">
+            <input type="url" id="inputUrl" placeholder="https://example.com/file.zip" required>
+            <button id="btnInspect" class="btn-secondary" title="Check Link Health">Inspect</button>
+          </div>
+
+          <!-- Probe Inspection Result Box -->
+          <div id="probeResult" class="probe-card hidden">
+            <div class="probe-row">
+              <span class="probe-label">File:</span>
+              <span id="probeFilename" class="probe-value font-mono">-</span>
+            </div>
+            <div class="probe-row">
+              <span class="probe-label">Size:</span>
+              <span id="probeSize" class="probe-value">-</span>
+            </div>
+            <div class="probe-row">
+              <span class="probe-label">Resume Support:</span>
+              <span id="probeResume" class="probe-status">-</span>
+            </div>
+          </div>
+
+          <label class="form-label" for="inputFilename">Custom Filename (Optional)</label>
+          <input type="text" id="inputFilename" placeholder="Leave empty for auto-detect">
+
+          <div class="form-row">
+            <div class="form-col">
+              <label class="form-label" for="selectChunkSize">Chunk Block Size</label>
+              <select id="selectChunkSize">
+                <option value="2">2 MB (Stable on slow networks)</option>
+                <option value="4" selected>4 MB (Recommended)</option>
+                <option value="8">8 MB (High-speed lines)</option>
+                <option value="16">16 MB (Fast multi-gigabit)</option>
+              </select>
+            </div>
+            <div class="form-col">
+              <label class="form-label" for="selectConnections">Connections</label>
+              <select id="selectConnections">
+                <option value="1">1 (gentle)</option>
+                <option value="2">2</option>
+                <option value="4" selected>4 (Recommended)</option>
+                <option value="8">8 (fastest)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="btnCancelAdd" class="btn-secondary">Cancel</button>
+          <button id="btnStartDownload" class="btn-primary">Start Download</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Refresh / Update Expired Link -->
+    <div class="modal-overlay hidden" id="refreshModal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>Refresh Expired Download Link</h3>
+          <button class="btn-close" id="btnCloseRefreshModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-info">
+            Did the download link expire while paused? Paste the fresh download URL from the host below to resume downloading without losing your downloaded chunks.
+          </p>
+          <div class="task-summary-box">
+            <div id="refreshTaskName" class="font-bold">-</div>
+            <div class="text-muted text-sm" id="refreshTaskProgress">-</div>
+          </div>
+
+          <label class="form-label" for="inputNewUrl">New Download URL</label>
+          <input type="url" id="inputNewUrl" placeholder="https://example.com/fresh_link_with_new_token" required>
+          <input type="hidden" id="refreshTaskId">
+          <div id="refreshError" class="alert-error hidden"></div>
+        </div>
+        <div class="modal-footer">
+          <button id="btnCancelRefresh" class="btn-secondary">Cancel</button>
+          <button id="btnConfirmRefresh" class="btn-primary">Update & Resume</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>
